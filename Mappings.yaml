@@ -1,0 +1,43 @@
+#Mappings are useful for looking up static stuff
+
+Parameters:
+  Environment:
+    Type: String
+    
+Mappings:
+  EnvironmentMap:
+    sandbox:
+      SomeRoleARN: 'arn:aws:iam::112233445566:role/RoleIdentity'
+      SomeUserARN: 'arn:aws:iam::112233445566:user/UserIdentity'
+      VersioningConfiguration: 'Suspended'
+    dev:
+      SomeRoleARN: 'arn:aws:iam::112233445566:role/RoleIdentity'
+      SomeUserARN: 'arn:aws:iam::112233445566:user/UserIdentity'
+      VersioningConfiguration: 'Suspended'
+    test:
+      SomeRoleARN: 'arn:aws:iam::112233445566:role/RoleIdentity'
+      SomeUserARN: 'arn:aws:iam::112233445566:user/UserIdentity'
+      VersioningConfiguration: 'Suspended'
+    prod:
+      SomeRoleARN: 'arn:aws:iam::112233445566:role/RoleIdentity'
+      SomeUserARN: 'arn:aws:iam::112233445566:user/UserIdentity'
+      VersioningConfiguration: 'Enabled'
+
+
+#Mappings usage:
+Resources:
+
+  #You set properties by looking them up in a map with a key
+  SomeResourceName:
+    Type: AWS::X:Y
+      Properties:
+        SomeRoleProperty: !FindInMap [EnvironmentMap, !Ref Environment, SomeRoleARN]
+        SomeUserProperty: !FindInMap [EnvironmentMap, !Ref Environment, SomeUserARN]
+  
+  #Looking up the VersioningConfiguration value in the map
+  SomeBucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: 'TheBucketName'
+      VersioningConfiguration:
+        Status: !FindInMap [EnvironmentMap, !Ref Environment, VersioningConfiguration]
