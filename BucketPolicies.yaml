@@ -1,0 +1,72 @@
+#Bucket Policies
+
+######################################################################################################
+# Example 1: Normal bucket policy
+# Two steps: 1) Bucket, 2) Policy
+######################################################################################################
+Parameters:
+
+    SomeUserOrRoleARN:
+        Type: String
+
+Resources:
+
+    #1 Bucket
+    S3Bucket:
+        #Bucket config here
+
+    # Policy
+    S3BucketPolicy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+            Bucket: !Ref S3Bucket
+            PolicyDocument:
+            Id: BucketPolicy1
+            Version: 2012-10-17
+            Statement:
+                - Sid: 1
+                Effect: Allow
+                Principal: 
+                    AWS: !Ref SomeUserOrRoleARN
+                    #or like this AWS: GetAtt! SomeIAMUserJustMade.Arn
+                Action: "s3:GetObject"
+                Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
+                
+######################################################################################################¤
+# Example 2: Bucket with CloudFront to publish files using Cloudfront Origin Access Identity
+# 3 steps: 1) OAI Policy, 2) Bucket 3) Bucket Policy
+######################################################################################################¤
+
+Resources:
+
+    #1: CF OAI Policy - This is always the same
+    CloudFrontOAI:
+        Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+        Properties: 
+            CloudFrontOriginAccessIdentityConfig: 
+            Comment: 'Descibe the use here'
+
+    #2: Bucket
+    S3Bucket:
+        #Bucket config here
+
+    #3: Bucket Policy that uses CF OAI
+    CloudFrontExposedBucketPolicy:
+    #Not sure if thisDependsOn is needed
+    DependsOn: 
+        - CloudFrontOAI
+        - S3Bucket
+        Type: AWS::S3::BucketPolicy
+        Properties:
+            Bucket: !Ref S3Bucket
+            PolicyDocument: 
+            Version: "2008-10-17"
+            Id: "PolicyForCloudFrontOriginAccessIdentity"
+            Statement: 
+            - Sid: "1"
+                Effect: "Allow"
+                Principal: 
+                AWS: !Join [ ' ', ['arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity', !Ref CloudFrontOAI] ]
+                #or possibly prettier as: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOAI}'
+                Action: "s3:GetObject"
+                Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
