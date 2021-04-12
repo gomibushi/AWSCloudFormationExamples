@@ -1,0 +1,29 @@
+Parameters:
+  Environment:
+    Type: String
+
+#Conditions Definitions - environment is a pretty common usage
+Conditions:
+  EnvironmentSandbox: !Equals [!Ref Environment, 'sandbox']
+  EnvironmentDev: !Equals [!Ref Environment, 'dev']
+  EnvironmentTest: !Equals [!Ref Environment, 'test']
+  EnvironmentProd: !Equals [!Ref Environment, 'prod']
+
+#Conditions usage:
+Resources:
+
+  #You make two instances of the same resource, this is the first with settings for Dev
+  ResourceInDev:
+      Type: AWS::X:Y
+      Condition: EnvironmentDev
+      Properties:
+          SomeProperty1: false
+          SomeProperty2: DevSettings
+
+  #This is the second but with settings for Prod
+  SameResourceButInProd:
+      Type: AWS::X:Y
+      Condition: EnvironmentProd
+      Properties:
+          SomeProperty1: true
+          SomeProperty2: ProdSettings
