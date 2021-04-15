@@ -1,0 +1,18 @@
+#Self-referencing security group
+#Note that you don't create the self-referencing rule as a property of the group, but as a separate resource back-referencing to the already created group
+Resources:
+
+  SomeSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: An SG with a self-reference
+      VpcId: !Ref SomeVPCID
+      
+  SomeSecurityGroupIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SomeSecurityGroup
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !Ref SomeSecurityGroup
