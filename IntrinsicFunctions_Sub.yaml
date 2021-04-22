@@ -1,0 +1,68 @@
+#Sub - short for "substitute" is very useful.
+#Official doc here is not bad: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html
+#It is in two ways: 1) with a key:value-map and 2) without a map if referencing a parameter, resource ID or attribute.
+#It can also mostly replace !Join and look better in your code.
+
+Parameters:
+
+  BucketName:
+    Type: String
+    
+  Env:
+    Type: String
+    
+Resources:
+  
+  #Simple, without a map
+  ResourceNameA:
+    Type: AWS::X::Y
+    Properties:
+      SomeARNProperty: !Sub 'arn:aws:s3:::${BucketName}'
+      Description: !Sub 'This is just text, then we substitute in the parameter ${BucketName} and then more text.'
+
+  #Some JSON-object building, snippet of KMS-policy as example - note the ${UserRole.Arn}-usage, which is pretty much !Sub replacing !GetAtt
+  ResourceNameB:
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy: !Sub |
+        {
+            "Version" : "2012-10-17",
+            "Id" : "YourPolicyID",
+            "Statement" : [ {
+              "Sid" : "Root access for KMS-key",
+              "Effect" : "Allow",
+              "Principal" : {
+                "AWS" : "arn:aws:iam::${AWS::AccountId}:root"
+              },
+              "Action" : "kms:*",
+              "Resource" : "*"
+            }, {
+              "Sid" : "Allow use of the key",
+              "Effect" : "Allow",
+              "Principal" : {
+                "AWS" : [ "${AdminRoleARN}", "${UserRole.Arn}" ]
+              } ]
+          }
+      
+    #With a map, and mapping - See Mappings.yaml for examples
+    ResourceNameC:
+      Type: AWS::X::Y
+      Properties:
+        SomeARNProperty: !Sub
+          - 'This String is built with ${AMapVariable}
+          - { AMapVariable: !FindInMap [EnvironmentMap, !Ref Environment, SomeRoleARN] }
+
+    #Replacing !Join
+    ResourceNameJoin:
+      Type: AWS::S3::Bucket
+      Properties: 
+        Tags: 
+        - Key: Name
+          Value: !Join [ '-', ['prefix', !Ref Env, 'bucket'] ] #Will look like 'prefix-dev-bucket' if Environment=dev
+
+    ResourceNameSub:
+      Type: AWS::S3::Bucket
+      Properties: 
+        Tags: 
+        - Key: Name
+          Value: !Sub 'prefix-${Env}-bucket' #Will create the same string for the tag, but looks a lot closer to the final string.
