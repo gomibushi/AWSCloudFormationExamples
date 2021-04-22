@@ -1,0 +1,39 @@
+Parameters:
+  
+  #Typically you may want to pass in some variables, or maybe set them in a Mappings: section - See mappings.yaml for examples.
+  SQLServerName:
+    Type: String
+
+  SQLServerUsername:
+    Type: String
+
+  #Typically passwords are stored in a safely in your environment and passed in, not stored inline in code.
+  SQLServerPassword:
+    Type: String
+
+Resources: 
+
+  #Security Group for Glue-jobs: You will want one that has a self reference. See example in SecurityGroups.yaml
+  SGGlueOnPremSQLServer:
+    Type: AWS::EC2::SecurityGroup
+    ...
+  
+  #Glue Connection - JDBC
+  GlueConnectionSQLServerBigDatabase:
+    Type: AWS::Glue::Connection
+    Properties: 
+      CatalogId: !Ref AWS::AccountId
+      ConnectionInput:
+        ConnectionType: JDBC
+        ConnectionProperties:
+          JDBC_CONNECTION_URL: !Sub "jdbc:sqlserver://${SQLServerName}:1433;databaseName=BigDatabase"
+          JDBC_ENFORCE_SSL: "false"
+          PASSWORD: !Ref SQLServerPassword
+          USERNAME: !Ref SQLServerUsername
+        Description: !Sub 'Connection for ${SQLServerName} on BigDatabase.'
+        Name: !Sub '${SQLServerName}-ImportantTable'
+        PhysicalConnectionRequirements: 
+          AvailabilityZone: !Sub '${AWS::Region}a'
+          SecurityGroupIdList:
+            - !Ref SGGlueOnPremSQLServer
+          SubnetId: !ImportValue SubnetStack-SubnetAID
