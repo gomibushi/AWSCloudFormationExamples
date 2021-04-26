@@ -14,14 +14,14 @@ Parameters:
 Resources:
   
   #Simple, without a map
-  ResourceNameA:
+  ResourceSimple:
     Type: AWS::X::Y
     Properties:
       SomeARNProperty: !Sub 'arn:aws:s3:::${BucketName}'
       Description: !Sub 'This is just text, then we substitute in the parameter ${BucketName} and then more text.'
 
   #Some JSON-object building, snippet of KMS-policy as example - note the ${UserRole.Arn}-usage, which is pretty much !Sub replacing !GetAtt
-  ResourceNameB:
+  ResourceJSON:
     Type: AWS::KMS::Key
     Properties:
       KeyPolicy: !Sub |
@@ -45,7 +45,7 @@ Resources:
           }
       
     #With a map, and mapping - See Mappings.yaml for examples
-    ResourceNameC:
+    ResourceNameMap:
       Type: AWS::X::Y
       Properties:
         SomeARNProperty: !Sub
