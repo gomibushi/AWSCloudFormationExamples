@@ -52,7 +52,7 @@ Resources:
           - 'This String is built with ${AMapVariable}
           - { AMapVariable: !FindInMap [EnvironmentMap, !Ref Environment, SomeRoleARN] }
 
-    #Replacing !Join
+    #Replacing Join with Sub
     ResourceNameJoin:
       Type: AWS::S3::Bucket
       Properties: 
