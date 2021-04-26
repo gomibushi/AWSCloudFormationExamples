@@ -51,7 +51,8 @@ Resources:
         SomeARNProperty: !Sub
           - 'This String is built with ${AMapVariable}
           - { AMapVariable: !FindInMap [EnvironmentMap, !Ref Environment, SomeRoleARN] }
-
+        OtherProperty: value
+        
     #Replacing Join with Sub
     ResourceNameJoin:
       Type: AWS::S3::Bucket
