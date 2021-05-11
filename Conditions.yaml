@@ -1,13 +1,22 @@
 Parameters:
+  
   Environment:
     Type: String
-
-#Conditions Definitions - environment is a pretty common usage
+    
+  CreateStuff:
+    Type: String
+    
+#Conditions Definitions - environment is a pretty common usage - note the last three as examples of !Not, !Or and !And-constructs. Also with reference to other !Conditions.
 Conditions:
   EnvironmentSandbox: !Equals [!Ref Environment, 'sandbox']
   EnvironmentDev: !Equals [!Ref Environment, 'dev']
   EnvironmentTest: !Equals [!Ref Environment, 'test']
   EnvironmentProd: !Equals [!Ref Environment, 'prod']
+  CreateStuffYes: !Equals [!Ref CreateStuff, 'true']
+  EnvironmentNotProd: !Not [!Equals [!Ref Environment, 'prod']] 
+  EnvironmentTestorProd: !Or [!Equals [!Ref Environment, 'test'], !Equals [!Ref Environment, 'prod']]
+  EnvironmentDevAndCreateStuff: !And [!Equals [!Ref Environment, 'dev'], !Equals [!Ref CreateStuff, 'true']]
+  EnvironmentTestAndCreateStuff: !And [!Condition EnvironmentTest, !Condition CreateStuffYes]
 
 #Conditions usage:
 Resources:
