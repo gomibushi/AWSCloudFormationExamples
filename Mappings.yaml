@@ -1,4 +1,6 @@
 #Mappings are useful for looking up static stuff
+#Important limitation: You can not use !Refs in Mappings. You must use static values.
+#Most likely you should be looking at Conditions instead if you find yourself limited by this.
 
 Parameters:
   Environment:
