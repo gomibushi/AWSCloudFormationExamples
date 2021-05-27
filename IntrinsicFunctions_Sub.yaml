@@ -67,3 +67,11 @@ Resources:
         Tags: 
         - Key: Name
           Value: !Sub 'prefix-${Env}-bucket' #Will create the same string for the tag, but looks a lot closer to the final string.
+          
+    #Warning: Supposedly this works, ended up not being able to test it.
+    ResourceImportValue:
+      Type: AWS::S3::Bucket
+      Properties:
+        SomeProperty: 
+          Fn::ImportValue:
+            !Sub "${StackName}-OutputID"
