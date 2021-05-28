@@ -67,7 +67,8 @@ Resources:
         Tags: 
         - Key: Name
           Value: !Sub 'prefix-${Env}-bucket' #Will create the same string for the tag, but looks a lot closer to the final string.
-          
+    
+    #Using !Sub with !ImportValue
     #This one caused me some confusion, the thing is you have to put the "Fn::ImportValue" on the line below the property, once indented.
     ResourceImportValue:
       Type: AWS::S3::Bucket
