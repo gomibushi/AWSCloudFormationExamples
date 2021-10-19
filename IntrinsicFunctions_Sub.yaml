@@ -76,3 +76,12 @@ Resources:
         SomeProperty: 
           Fn::ImportValue:
             !Sub "${StackName}-OutputID"
+            
+    #Using!Sub with pseudo parameters - That are the AWS::<name> variables, like AWS::Stackname
+    #You have to use the following structure, where you list the string you want to build and then a mapping of the pseudo parameters to variables
+    AlarmTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: !Sub
+          - ${StackName}-alarms-topic
+          - { StackName: !Ref "AWS::StackName" }
