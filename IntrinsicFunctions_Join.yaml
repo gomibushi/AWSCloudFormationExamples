@@ -1,0 +1,29 @@
+#Join is harder to read than Sub, but sometimes needed when joining with !Ref.
+#Official doc here is pretty short and devoid of examples: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-join.html
+
+Parameters:
+
+  BucketName:
+    Type: String
+    
+  Env:
+    Type: String
+    
+Resources:
+  
+  #Example of how to referense the arn of a an IAM policy using both a pseudo parameter (AWS::AccountID) and and a normal reference.
+  LambdaPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  ...
+    
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ...
+      ManagedPolicyArns: 
+      - !Join
+        - ''
+        - - 'arn:aws:iam::'
+          - !Ref "AWS::AccountId"
+          - ':policy/'
+          - !Ref LambdaPolicy
