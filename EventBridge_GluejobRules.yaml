@@ -1,0 +1,25 @@
+#There is not simple CW metric to look at for the run state of a Glue job.
+#There is however an event when a job finishes that will publish either a "FAILED" or "SUCCEEDED" state.
+#Here is how you can create a rule and also store the result in parameter store
+#Big thanks to @praneethpeiris this article: https://gnomezgrave.com/2020/01/26/get-notified-on-aws-glue-job-failures/
+
+  Event:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Rule to trigger on failed runs
+      EventPattern:
+        source:
+          - aws.glue
+        detail-type:
+          - Glue Job State Change
+        detail:
+          jobName:
+            - 'The glue job name VERBATIM'
+          state:
+            - FAILED #For successfull jobs use the state "SUCCEEDED"
+      Name: 'a-good-rule-name'
+      State: ENABLED
+      Targets:
+        - Arn: arn:aws:sns:eu-west-1:123123123:sns-name
+          "Id": "sns-email-sample"
+
